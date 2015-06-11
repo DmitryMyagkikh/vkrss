@@ -9,8 +9,9 @@ class VkWallParser {
 
     static String PUB_DATE_FORMAT = 'E, dd MMM yyyy HH:mm:ss Z'
     static String LINK_DATE_FORMAT = 'yyyy_MM_dd_HH_mm'
-    static String TODAY = 'Today'
-    static String YESTERDAY = 'Yesterday'
+    static String TODAY = 'today'
+    static String YESTERDAY = 'yesterday'
+    static String EMPTY_NEWS = 'Пусто'
 
     SimpleDateFormat pubDateFormatter
 
@@ -50,11 +51,20 @@ class VkWallParser {
                             Date date = sdf.parse(dateString)
                             date[Calendar.YEAR] = today[Calendar.YEAR]
 
+                            String pubDateFormated = pubDateFormatter.format(date);
+                            println "++++++++++++++++++++++++++++++++++++++++++++++"
+                            println pubDateFormated
+                            println "++++++++++++++++++++++++++++++++++++++++++++++"
 
-                            pubDate(pubDateFormatter.format(date))
+
+                            pubDate(pubDateFormated)
                             link("${url}/${date.format(LINK_DATE_FORMAT)}")
 
                             String mainNews = news."**".find { it.@class.toString().contains("wi_body") }.toString()
+                            mainNews = mainNews.replaceAll('[0-9]*:[0-9]*$', '').replaceAll('\\.[0-9]*$', '')
+                            if (mainNews.length() <= 3) {
+                                mainNews = EMPTY_NEWS
+                            }
                             List<String> words = mainNews.split(' ') as List<String>
                             title(words[0..Math.min(7, words.size()) - 1].join(' '))
 
